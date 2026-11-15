@@ -1,0 +1,11 @@
+# Never publish machine dumps or firmware artifacts.
+*.log
+*.pkg
+*.ipsw
+*.dmg
+*.bin
+.env
+.env.*
+private/
+firmware/
+logs/
