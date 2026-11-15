@@ -1,4 +1,4 @@
-# Touch Bar on Omarchy
+# MacBook Touch Bar
 
 Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2 running Arch Linux / Omarchy. This is a troubleshooting notebook, not a replacement driver or firmware distribution.
 
@@ -7,7 +7,7 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | Area | Status |
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
-| Touch Bar stops responding around suspend/resume | Open; renderer-only restart failed; hardware-service + renderer restart awaiting physical confirmation |
+| Touch Bar stays blank after suspend/resume | Open; renderer-only and hardware-service + renderer restarts both failed to restore the display |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
 ## Notes

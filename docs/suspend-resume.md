@@ -30,7 +30,7 @@ pkexec /usr/bin/systemctl restart t1-touchbar-hw.service
 systemctl --user restart t1-touchbar.service
 ```
 
-Both services returned to active with new processes. The old renderer logged a lost hardware connection during the hardware-service restart, as expected. Physical recovery remains pending user confirmation.
+Both services returned to active with new processes. The old renderer logged a lost hardware connection during the hardware-service restart, as expected. The user confirmed the Touch Bar remained blank after this second attempt. **Restarting both services did not restore the display.**
 
 No module reload, manual USB reset, firmware operation or automatic resume hook was performed.
 
@@ -58,7 +58,7 @@ Inspect kernel logs in a narrow window around the affected resume. Review output
 ## Next evidence needed
 
 - Was the screen black, frozen, or displaying controls with no touch response?
-- Renderer-only restart did **not** restore it. Did restarting the hardware service and renderer restore it?
+- Neither renderer-only restart nor hardware-service + renderer restart restored the display. Investigate device/driver display state next rather than installing a service-restart resume hook.
 - Does the issue recur on the next sleep/wake, and does the same recovery work?
 - Does the hardware service log any new errors during the failure?
 
