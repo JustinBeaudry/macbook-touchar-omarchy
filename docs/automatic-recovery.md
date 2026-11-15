@@ -2,6 +2,8 @@
 
 A small local workaround for the post-sleep dark Touch Bar, **not a general MacBook driver installer**. The combined wake sequence was physically confirmed once on the machine described below. Automatic sleep/wake reliability still needs attended testing.
 
+**Local installation verified on 2026-11-15:** the helper and drop-in are root-owned, match the repository copies, and appear in the effective suspend service configuration. Systemd unit verification passed, with an unrelated warning from the pre-existing NVMe suspend unit. No sleep/wake test was triggered during installation.
+
 ## Supported hardware — intentionally narrow
 
 - Apple **MacBookPro14,2**, T1 in USB configuration 2 (`05ac:8600`).
