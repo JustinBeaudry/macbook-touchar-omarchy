@@ -7,7 +7,8 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | Area | Status |
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
-| Touch Bar stays blank after suspend/resume | Manual recovery and one automatic sleep/wake confirmed; slow overall wake reported, repeated reliability unverified |
+| Touch Bar stays blank after suspend/resume | Manual and automatic recovery confirmed; repeated reliability unverified |
+| Keyboard/trackpad unresponsive after wake | One SPI runtime-power comparison improved input from 10–12 s to under 0.12 s; persistent override not installed |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
 ## Automatic wake recovery
@@ -26,6 +27,7 @@ Installation does not put the machine to sleep or call firmware. To remove: `sud
 ## Notes
 
 - [Automatic recovery: installation, safety, logs and uninstall](docs/automatic-recovery.md)
+- [SPI keyboard/trackpad wake-delay comparison](docs/spi-input-wake-delay.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
