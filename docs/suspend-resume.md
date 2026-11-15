@@ -19,9 +19,20 @@
 systemctl --user restart t1-touchbar.service
 ```
 
-The restart completed and a new renderer process was active. No new error appeared in the immediate renderer journal. **Panel visibility, touch response and survival of another suspend/resume remain unconfirmed.**
+The restart completed and a new renderer process was active. No new error appeared in the immediate renderer journal. **The user subsequently confirmed the panel was still blank: renderer-only restart did not recover this incident.**
 
-No hardware-service restart, module reload, USB reset, firmware operation or automatic resume hook was performed.
+### Second recovery attempt
+
+Restarted the system hardware service with graphical privilege authorization, then restarted the user renderer:
+
+```bash
+pkexec /usr/bin/systemctl restart t1-touchbar-hw.service
+systemctl --user restart t1-touchbar.service
+```
+
+Both services returned to active with new processes. The old renderer logged a lost hardware connection during the hardware-service restart, as expected. Physical recovery remains pending user confirmation.
+
+No module reload, manual USB reset, firmware operation or automatic resume hook was performed.
 
 ## Recovery ladder
 
@@ -47,7 +58,7 @@ Inspect kernel logs in a narrow window around the affected resume. Review output
 ## Next evidence needed
 
 - Was the screen black, frozen, or displaying controls with no touch response?
-- Did the renderer-only restart restore it?
+- Renderer-only restart did **not** restore it. Did restarting the hardware service and renderer restore it?
 - Does the issue recur on the next sleep/wake, and does the same recovery work?
 - Does the hardware service log any new errors during the failure?
 

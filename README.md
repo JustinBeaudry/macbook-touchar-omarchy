@@ -7,7 +7,7 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | Area | Status |
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
-| Touch Bar stops responding around suspend/resume | Open; renderer restart attempted, visual confirmation pending |
+| Touch Bar stops responding around suspend/resume | Open; renderer-only restart failed; hardware-service + renderer restart awaiting physical confirmation |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
 ## Notes
