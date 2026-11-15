@@ -13,6 +13,7 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 ## Notes
 
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
+- [Misleading renderer warning and diagnostic findings](docs/renderer-warning.md)
 - [Suspend/resume investigation and recovery ladder](docs/suspend-resume.md)
 - [Observed environment and evidence](docs/environment.md)
 
