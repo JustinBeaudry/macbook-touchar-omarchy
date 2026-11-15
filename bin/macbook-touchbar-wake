@@ -1,0 +1,133 @@
+#!/usr/bin/python3
+"""Narrowly gated, one-shot recovery for a verified T1 post-suspend dark panel."""
+import argparse
+import fcntl
+import hashlib
+import os
+from pathlib import Path
+import sys
+import time
+
+MODEL = 'MacBookPro14,2'
+SSDT6_SHA256 = '38c8858a41c0aa3636fb995593e70cb7bdc9c839655ce422547ba8d4ddc580d1'
+ACPI_DEVICE = r'\_SB_.PCI0.XHC1.RHUB.ASOC'
+METHOD = r'\_SB.PCI0.XHC1.RHUB.ASOC.SOCW'
+REPORT_LEN = 15
+AWAKE = bytes([3, 2, 0xf4, 1] + [0] * 11)
+
+
+def validate_identity(model, acpi_path, table):
+    if model != MODEL:
+        raise RuntimeError('Unsupported model; no ACPI call made')
+    if acpi_path != ACPI_DEVICE:
+        raise RuntimeError('Unexpected ACPI device path; no ACPI call made')
+    if hashlib.sha256(table).hexdigest() != SSDT6_SHA256:
+        raise RuntimeError('Unverified SSDT6 fingerprint; no ACPI call made')
+
+
+def validate_host():
+    validate_identity(
+        Path('/sys/class/dmi/id/product_name').read_text().strip(),
+        Path('/sys/bus/acpi/devices/APP7777:00/path').read_text().strip(),
+        Path('/sys/firmware/acpi/tables/SSDT6').read_bytes(),
+    )
+
+
+def find_panel(root=Path('/sys/class/hidraw'), dev_root=Path('/dev')):
+    candidates = []
+    for node in root.glob('hidraw*'):
+        interface = (node / 'device').resolve().parent
+        usb = interface.parent
+        try:
+            identity = tuple(path.read_text().strip().lower() for path in (
+                usb / 'idVendor', usb / 'idProduct', interface / 'bInterfaceNumber'))
+        except OSError:
+            continue
+        if identity == ('05ac', '8600', '06'):
+            candidates.append(dev_root / node.name)
+    if len(candidates) > 1:
+        raise RuntimeError('Ambiguous display HID interface; no ACPI call made')
+    return candidates[0] if candidates else None
+
+
+def wait_for_panel():
+    # Wait only for discovery. Never retry a firmware call or report write.
+    for attempt in range(6):
+        panel = find_panel()
+        if panel is not None:
+            return panel
+        if attempt < 5:
+            time.sleep(1)
+    raise RuntimeError('T1 display HID interface unavailable; no ACPI call made')
+
+
+def ioctl_code(number):
+    return (3 << 30) | (REPORT_LEN << 16) | (ord('H') << 8) | number
+
+
+def power_byte(fd):
+    report = bytearray(REPORT_LEN)
+    report[0] = 3
+    fcntl.ioctl(fd, ioctl_code(0x07), report)
+    if report[0] != 3:
+        raise RuntimeError('Unexpected HID report ID')
+    return report[1]
+
+
+def call_host_awake():
+    # Never call SOCW(0) or the separate hardware-reset method.
+    with open('/proc/acpi/call', 'w') as call:
+        call.write(METHOD + ' 0x1\n')
+    result = Path('/proc/acpi/call').read_bytes().rstrip(b'\0\n').decode('ascii', errors='replace')
+    print(f'SOCW(1) result: {result}', flush=True)
+    if result != '0x0':
+        raise RuntimeError('ACPI did not acknowledge success; no display write attempted')
+
+
+def wake():
+    validate_host()
+    panel = wait_for_panel()
+    fd = os.open(panel, os.O_RDWR | os.O_CLOEXEC)
+    try:
+        before = power_byte(fd)
+        print(f'Display awake byte before: {before:#04x}', flush=True)
+        # An awake HID byte alone does not prove the host-awake mailbox was sent.
+        call_host_awake()
+        if power_byte(fd) != 2:
+            fcntl.ioctl(fd, ioctl_code(0x06), bytearray(AWAKE))
+            print('Sent one display-awake report.', flush=True)
+        after = power_byte(fd)
+        print(f'Display awake byte after: {after:#04x}', flush=True)
+        if after != 2:
+            raise RuntimeError('Display did not acknowledge awake state')
+        print('Wake sequence acknowledged; illumination requires physical confirmation.', flush=True)
+    finally:
+        os.close(fd)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument('--check', action='store_true', help='read-only compatibility check')
+    action.add_argument('--wake', action='store_true', help='one post-suspend recovery attempt')
+    args = parser.parse_args(argv)
+    try:
+        if os.geteuid() != 0:
+            raise RuntimeError('Root required to read firmware or access the display')
+        if args.check:
+            validate_host()
+            if find_panel() is None:
+                raise RuntimeError('T1 display HID interface unavailable')
+            if not Path('/proc/acpi/call').exists():
+                raise RuntimeError('acpi_call must already be loaded')
+            print('Compatible: verified MacBookPro14,2 firmware, T1 display HID, acpi_call.')
+        else:
+            wake()
+    except (OSError, RuntimeError) as error:
+        print(f'Touch Bar wake refused/failed: {error}', file=sys.stderr, flush=True)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

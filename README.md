@@ -7,10 +7,25 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | Area | Status |
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
-| Touch Bar stays blank after suspend/resume | Manual recovery confirmed: verified `SOCW(1)` + HID display-awake report; automatic recovery not installed |
+| Touch Bar stays blank after suspend/resume | Manual recovery confirmed; installable automatic workaround below, attended resume validation pending |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
+## Automatic wake recovery
+
+**Only MacBookPro14,2 with the exact firmware-table fingerprint verified here.** Other models/firmware are refused. Requires working T1Bridge and loaded `acpi_call`; this does not install drivers. ACPI calls can hang affected machines—read [support limits, safety and rollback](docs/automatic-recovery.md) first.
+
+```bash
+git clone https://github.com/JustinBeaudry/macbook-touchar-omarchy.git
+cd macbook-touchar-omarchy
+python3 -m unittest discover -s tests -v
+sudo bash install.sh
+```
+
+Installation does not put the machine to sleep or call firmware. To remove: `sudo bash install.sh --uninstall` from the same revision.
+
 ## Notes
+
+- [Automatic recovery: installation, safety, logs and uninstall](docs/automatic-recovery.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
@@ -26,7 +41,7 @@ From the affected desktop user's session:
 systemctl --user restart t1-touchbar.service
 ```
 
-This did **not** recover the observed post-sleep dark panel; see the confirmed wake recovery above. An `active` service does **not** prove that the panel or touch input works. Test the controls physically and record the result. No automatic resume workaround is installed by this repository.
+This did **not** recover the observed post-sleep dark panel; see the confirmed wake recovery above. An `active` service does **not** prove that the panel or touch input works. Test the controls physically and record the result. The optional installer above adds the separate confirmed wake sequence, not repeated service restarts.
 
 ## Upstream projects
 

@@ -9,3 +9,5 @@
 private/
 firmware/
 logs/
+__pycache__/
+*.pyc

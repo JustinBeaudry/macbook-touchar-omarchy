@@ -45,9 +45,9 @@ Do not copy this ACPI path to another machine without verifying its firmware and
 
 The repeated “selected renderer unavailable” notification was a separate misleading fallback message when no custom renderer was configured. Its local messaging workaround did not recover the panel.
 
-## Next step
+## Follow-up
 
-If authorized, implement a narrowly gated resume workaround with bounded execution and logging, then validate an attended sleep/wake cycle. Keep manual recovery, automatic-hook installation, and repeated reliability testing as separate milestones.
+The user authorized automatic recovery. An [installable, model- and firmware-gated suspend-service workaround](automatic-recovery.md) is now available with 18 isolated safety tests. It uses a userspace timeout and journal logging; firmware/kernel hangs cannot be bounded by that timeout. Attended sleep/wake validation remains pending. Manual recovery, automatic integration, and repeated reliability testing remain separate milestones.
 
 ## Provenance
 
