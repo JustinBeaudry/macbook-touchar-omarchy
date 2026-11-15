@@ -1,6 +1,8 @@
 # Suspend/resume investigation
 
-## 2026-11-15 — open incident
+## 2026-11-15 — incident investigation
+
+**Later outcome:** [Manual wake recovery was confirmed](confirmed-wake-recovery.md) using the firmware-verified `SOCW(1)` call followed by a HID display-awake report. The failed steps below are preserved as history; no automatic recovery hook is installed.
 
 **Reported:** Touch Bar stopped working and behaves oddly around sleep.
 

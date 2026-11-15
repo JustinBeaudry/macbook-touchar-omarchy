@@ -7,17 +7,18 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | Area | Status |
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
-| Touch Bar stays blank after suspend/resume | Open; renderer-only and hardware-service + renderer restarts both failed to restore the display |
+| Touch Bar stays blank after suspend/resume | Manual recovery confirmed: verified `SOCW(1)` + HID display-awake report; automatic recovery not installed |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
 ## Notes
 
+- [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
 - [Misleading renderer warning and diagnostic findings](docs/renderer-warning.md)
 - [Suspend/resume investigation and recovery ladder](docs/suspend-resume.md)
 - [Observed environment and evidence](docs/environment.md)
 
-## Quick recovery attempt
+## Earlier renderer-only recovery attempt
 
 From the affected desktop user's session:
 
@@ -25,7 +26,7 @@ From the affected desktop user's session:
 systemctl --user restart t1-touchbar.service
 ```
 
-This only restarts the renderer. An `active` service does **not** prove that the panel or touch input works. Test the controls physically and record the result. No automatic resume workaround is installed by this repository.
+This did **not** recover the observed post-sleep dark panel; see the confirmed wake recovery above. An `active` service does **not** prove that the panel or touch input works. Test the controls physically and record the result. No automatic resume workaround is installed by this repository.
 
 ## Upstream projects
 
