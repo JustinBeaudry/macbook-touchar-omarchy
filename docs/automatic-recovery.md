@@ -1,8 +1,21 @@
 # Install automatic post-suspend recovery
 
-A small local workaround for the post-sleep dark Touch Bar, **not a general MacBook driver installer**. The combined wake sequence was physically confirmed once on the machine described below. Automatic sleep/wake reliability still needs attended testing.
+A small local workaround for the post-sleep dark Touch Bar, **not a general MacBook driver installer**. The combined wake sequence was physically confirmed once on the machine described below. One automatic sleep/wake recovery was subsequently user-confirmed; repeated-cycle reliability and overall wake latency remain unvalidated.
 
 **Local installation verified on 2026-11-15:** the helper and drop-in are root-owned, match the repository copies, and appear in the effective suspend service configuration. Systemd unit verification passed, with an unrelated warning from the pre-existing NVMe suspend unit. No sleep/wake test was triggered during installation.
+
+## First automatic cycle — 2026-11-15
+
+The user confirmed recovery after a normal sleep/wake, but reported slow wake time. The suspend-service journal shows:
+
+- Return from system sleep: `17:50:43.588`.
+- User slice thawed: `17:50:43.601`.
+- Helper's initial power-byte read: `17:50:43.772` (`0x01`).
+- `SOCW(1)` acknowledged: `17:50:43.855` (`0x0`).
+- Awake report/readback complete: `17:50:43.873` (`0x02`).
+- Suspend service complete: `17:50:43.882`.
+
+The recovery completed about **0.285 seconds after systemd-sleep returned**, including about **83 ms** between the initial read and ACPI acknowledgement. It did not hit the discovery retry delay or 12-second timeout. Kernel logs around resume also contain PCIe D3 power-state failures, Thunderbolt warnings and T1 USB descriptor timeouts; these are investigation leads, not a proven attribution of the user's perceived delay. Whole-screen versus Touch Bar latency still needs clarification. No power-policy or driver change was made in response to the report.
 
 ## Supported hardware — intentionally narrow
 
