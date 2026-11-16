@@ -13,7 +13,7 @@ A timing-only evdev observer recorded fresh activity independently of the lock-s
 
 The user confirmed the second cycle was **“Much better this time.”**
 
-This is one baseline and one intervention cycle, not repeated reliability validation. It strongly supports a runtime-power-management contribution on the SPI path, but does not isolate which of the two devices needs the override.
+This is one baseline and one intervention cycle, not repeated reliability validation. It supports a runtime-power-management contribution on the SPI path, but does not isolate which of the two devices needs the override. The systemd-sleep periods also differed: 53.568 s for the baseline versus 11.032 s for the intervention (including transition time). Comparable-duration repeats are needed before attributing the full improvement to the power settings.
 
 ## Temporary intervention
 
@@ -38,6 +38,6 @@ An Omarchy sleep-inhibitor restart error also appeared around wake. Its presence
 
 ## Follow-up
 
-If authorized, persist a narrowly model/device-gated override for these two runtime-power settings, with read-only status and rollback support. Keeping the controller awake may increase idle battery consumption. Validate more attended sleep/wake cycles and battery behavior before calling it a general fix. Do not apply a broad PCI/USB power-saving disable to other machines.
+The user raised battery concerns before authorizing persistence. [Remediation research](spi-power-remediation-research.md) recommends testing a short wake-only pulse, then a transition-only bracket if needed, while retaining normal idle autosuspend. Do not install a persistent override by default from this one comparison. Awake-idle battery cost has not been measured, and keeping a child active may also keep its parent active. Validate comparable-duration repeated cycles and battery behavior; do not apply a broad PCI/USB power-saving disable.
 
 Evidence: local timing-only input observation, bounded suspend-service logs, sysfs identity/power-state reads, and user confirmation. Raw input content and full logs are intentionally not published.

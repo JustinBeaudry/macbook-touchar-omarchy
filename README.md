@@ -28,6 +28,7 @@ Installation does not put the machine to sleep or call firmware. To remove: `sud
 
 - [Automatic recovery: installation, safety, logs and uninstall](docs/automatic-recovery.md)
 - [SPI keyboard/trackpad wake-delay comparison](docs/spi-input-wake-delay.md)
+- [Lower-power remediation research and proposed tests](docs/spi-power-remediation-research.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
