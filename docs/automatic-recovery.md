@@ -53,6 +53,10 @@ Installed files, both root-owned:
 
 There is no polling process, automatic reboot, package replacement, firmware flashing or Touch ID/keybag modification. This does not install or configure T1Bridge, drivers or `acpi_call` for you.
 
+## Optional keyboard/trackpad recovery
+
+`sudo bash install.sh --with-spi-pulse` additionally installs the [opt-in two-second SPI runtime-power pulse](optional-spi-pulse.md). It restores original power policies rather than forcing the controller on permanently. Default installation does not enable it. Use `--uninstall-spi-pulse` to remove only that option; `--uninstall` removes both recoveries.
+
 ## How it runs
 
 The systemd drop-in adds an `ExecStartPost` to **systemd-suspend.service**, so recovery runs after `systemd-sleep suspend` returns. It does not run at boot, on screen blanking, or from the separate hibernate services. It does not depend on deprecated `/etc/systemd/system-sleep` hook discovery.
@@ -94,7 +98,7 @@ From the same revision used for installation:
 sudo bash install.sh --uninstall
 ```
 
-This removes only the two known files when their contents match the checkout and reloads systemd. It performs no sleep or ACPI call. If files were changed, it refuses removal so you can inspect them first. Empty parent directories may remain.
+This removes matching base recovery files and any installed optional SPI feature files, then reloads systemd. For the SPI option it stops the service and restores any saved power policy before removing the helper. It performs no sleep or ACPI call. If files were changed, it refuses removal so you can inspect them first. Empty parent directories may remain.
 
 No wake-state change needs to be undone. The separate keyboard-backlight and notification workarounds are not installed or removed by this installer.
 

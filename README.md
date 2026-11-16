@@ -24,11 +24,22 @@ sudo bash install.sh
 
 Installation does not put the machine to sleep or call firmware. To remove: `sudo bash install.sh --uninstall` from the same revision.
 
+### Optional: faster keyboard/trackpad response after wake
+
+A separate, **experimental opt-in** pulses SPI runtime power for two seconds, then restores the original settings—no permanent always-on override:
+
+```bash
+sudo bash install.sh --with-spi-pulse
+```
+
+Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first. One temporary hardware trial passed; the automatic integration needs attended validation. Default installation leaves this feature off.
+
 ## Notes
 
 - [Automatic recovery: installation, safety, logs and uninstall](docs/automatic-recovery.md)
 - [SPI keyboard/trackpad wake-delay comparison](docs/spi-input-wake-delay.md)
 - [Lower-power remediation research and proposed tests](docs/spi-power-remediation-research.md)
+- [Optional two-second SPI pulse: install and rollback](docs/optional-spi-pulse.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)

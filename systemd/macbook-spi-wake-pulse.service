@@ -1,0 +1,26 @@
+[Unit]
+Description=Brief post-suspend MacBook SPI runtime wake pulse
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/macbook-spi-wake-pulse --pulse
+# Separate process: also runs after ExecStart failure, termination or timeout.
+ExecStopPost=/usr/local/libexec/macbook-spi-wake-pulse --restore
+TimeoutStartSec=5s
+TimeoutStopSec=5s
+Restart=no
+RuntimeDirectory=macbook-spi-wake-pulse
+RuntimeDirectoryMode=0700
+# Preserve recovery evidence if restoration fails; /run is cleared at reboot.
+RuntimeDirectoryPreserve=yes
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/sys/devices/pci0000:00/0000:00:1e.3/power /sys/devices/pci0000:00/0000:00:1e.3/pxa2xx-spi.3/power
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX

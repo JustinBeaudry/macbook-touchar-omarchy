@@ -1,0 +1,139 @@
+#!/usr/bin/python3
+"""Opt-in two-second SPI runtime wake pulse; preserve original idle power policy."""
+import argparse
+import json
+import os
+from pathlib import Path
+import stat
+import sys
+import time
+
+PCI = Path('/sys/bus/pci/devices/0000:00:1e.3')
+CONTROLLER = PCI / 'pxa2xx-spi.3'
+TARGETS = {'parent': PCI / 'power/control', 'controller': CONTROLLER / 'power/control'}
+STATE_DIR = Path('/run/macbook-spi-wake-pulse')
+STATE_FILE = 'originals.json'
+
+
+def validate_host():
+    if Path('/sys/class/dmi/id/product_name').read_text().strip() != 'MacBookPro14,2':
+        raise RuntimeError('Unsupported model; no power settings changed')
+    if (PCI / 'vendor').read_text().strip() != '0x8086' or (PCI / 'device').read_text().strip() != '0x9d2a':
+        raise RuntimeError('Unexpected SPI PCI device; no power settings changed')
+    if CONTROLLER.resolve() not in Path('/sys/bus/spi/devices/spi-APP000D:00').resolve().parents:
+        raise RuntimeError('Unexpected keyboard SPI parent; no power settings changed')
+
+
+def validate_originals(originals):
+    if not isinstance(originals, dict) or set(originals) != set(TARGETS):
+        raise RuntimeError('Invalid saved target set')
+    if any(not isinstance(value, str) or value not in ('auto', 'on') for value in originals.values()):
+        raise RuntimeError('Invalid saved power policy')
+
+
+def read_originals():
+    originals = {name: path.read_text().strip() for name, path in TARGETS.items()}
+    validate_originals(originals)
+    return originals
+
+
+def check_state_dir():
+    info = STATE_DIR.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid() or info.st_mode & 0o077:
+        raise RuntimeError('Unsafe runtime state directory')
+
+
+def save_state(originals):
+    validate_originals(originals)
+    check_state_dir()
+    path = STATE_DIR / STATE_FILE
+    # Never overwrite a prior invocation's restoration record.
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            json.dump({'version': 1, 'originals': originals}, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+    except BaseException:
+        # No power writes occur until the complete record has been saved.
+        path.unlink(missing_ok=True)
+        raise
+
+
+def load_state():
+    check_state_dir()
+    fd = os.open(STATE_DIR / STATE_FILE, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    with os.fdopen(fd, 'r') as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_mode & 0o077 or info.st_size > 1024:
+            raise RuntimeError('Unsafe restoration record')
+        record = json.loads(stream.read(1025))
+    if not isinstance(record, dict) or set(record) != {'version', 'originals'} or type(record['version']) is not int or record['version'] != 1:
+        raise RuntimeError('Invalid restoration record')
+    validate_originals(record['originals'])
+    return record['originals']
+
+
+def restore():
+    try:
+        originals = load_state()
+    except FileNotFoundError:
+        print('No saved SPI power state; nothing to restore.', flush=True)
+        return
+    validate_host()
+    errors = []
+    for name in ('controller', 'parent'):
+        path = TARGETS[name]
+        try:
+            path.write_text(originals[name] + '\n')
+            if path.read_text().strip() != originals[name]:
+                raise RuntimeError('Restored value did not match')
+            print(f'Restored SPI {name}: {originals[name]}', flush=True)
+        except (OSError, RuntimeError) as error:
+            errors.append(f'{name}: {error}')
+    if errors:
+        # Retain the record so ExecStopPost or an administrator can retry.
+        raise RuntimeError('Restoration incomplete: ' + '; '.join(errors))
+    (STATE_DIR / STATE_FILE).unlink()
+
+
+def pulse():
+    validate_host()
+    originals = read_originals()
+    save_state(originals)
+    try:
+        for name in ('parent', 'controller'):
+            TARGETS[name].write_text('on\n')
+            if TARGETS[name].read_text().strip() != 'on':
+                raise RuntimeError(f'SPI {name} did not accept runtime wake request')
+        print('SPI wake pulse active for 2 seconds; original idle policy will be restored.', flush=True)
+        time.sleep(2)
+    finally:
+        restore()
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument('--check', action='store_true', help='read-only identity and power-policy check')
+    action.add_argument('--pulse', action='store_true', help='run once after suspend via the supplied systemd unit')
+    action.add_argument('--restore', action='store_true', help='restore a saved policy after interruption')
+    args = parser.parse_args(argv)
+    try:
+        if os.geteuid() != 0:
+            raise RuntimeError('Root required')
+        if args.check:
+            validate_host()
+            print('Compatible SPI path; current policy: ' + json.dumps(read_originals(), sort_keys=True))
+        elif args.restore:
+            restore()
+        else:
+            pulse()
+    except (OSError, RuntimeError, ValueError) as error:
+        print(f'SPI wake pulse refused/failed: {error}', file=sys.stderr, flush=True)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
