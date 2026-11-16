@@ -4,7 +4,7 @@ Research date: 2026-11-15. **No persistent SPI override installed; both runtime-
 
 ## Recommendation
 
-Do not ship an always-on SPI override as the default. First test a **short, post-resume-only runtime wake pulse**, restoring the original controls afterward. If that fails, test a **transition-only pre/post suspend bracket**. Both are proposed experiments, not validated fixes.
+Do not ship an always-on SPI override as the default. A **short, post-resume-only runtime wake pulse** has now passed one attended trial with user-confirmed responsiveness after an idle pause, and both controls restored to `auto`. Prefer this candidate over a persistent override, while keeping repeated-cycle reliability unverified. A **transition-only pre/post suspend bracket** remains an untested fallback.
 
 A persistent override remains a fallback only after controlled replication and measurement of the actual battery cost. We have not measured that cost and should not imply that it is either negligible or severe.
 
@@ -44,11 +44,28 @@ Source references use upstream Linux commit `aebb7274476403040d582c61478df8f4a7b
 5. [Parent dependence on active children](https://github.com/torvalds/linux/blob/aebb7274476403040d582c61478df8f4a7bf9cd3/Documentation/power/runtime_pm.rst#L372-L391).
 6. [LPSS state save/restore](https://github.com/torvalds/linux/blob/aebb7274476403040d582c61478df8f4a7bf9cd3/drivers/mfd/intel-lpss.c#L471-L526) and [applespi resume initialization](https://github.com/torvalds/linux/blob/aebb7274476403040d582c61478df8f4a7bf9cd3/drivers/input/keyboard/applespi.c#L1870-L1902).
 
+## Wake-only pulse trial — 2026-11-15
+
+The earlier attempt spanned multiple sleep cycles and was inconclusive. On the subsequent run:
+
+- Both settings remained `auto` before sleep.
+- The observer detected resume at `19:43:52.561`; the pulse started at `.564` and both controls were `on` by `.565`.
+- Fresh keyboard activity arrived after **0.686 s**.
+- An independent guard restored both original `auto` values at `19:43:54.567–.568`, two seconds after the pulse began.
+- Both devices reported runtime-suspended by `.630`.
+- Fresh trackpad activity arrived after **2.658 s**, after restoration and an observed runtime suspension.
+- The devices subsequently transitioned between active and suspended while remaining `auto`.
+- The user confirmed the wake **“felt fine”** and that input still worked after the requested 15-second idle pause. That idle-pause outcome is user-confirmed; the timing trace did not independently isolate a full 15-second quiet interval.
+
+The user performed a second test during the same observer run. The one-shot guard correctly refused a second pulse and restored the original values; that second wake is not another pulse-validation cycle. No persistent SPI integration was installed. Both settings were independently checked afterward as `auto`/`suspended`.
+
+This supports a transition-local workaround without permanently disabling idle runtime PM. It does not establish zero energy cost, repeated reliability, the minimum device scope, or a kernel-level root cause.
+
 ## Ranked remediation candidates
 
 | Candidate | Rationale | Power trade-off and uncertainty |
 | --- | --- | --- |
-| **1. Short post-resume wake pulse** | After resume, set the validated controller(s) to `on` briefly, then restore their original values. Linux defines this write as a runtime wake request. | Preserves normal idle autosuspend outside the pulse. Untested: may be too late if the failure originates before/during system resume, or may recur immediately once `auto` is restored. |
+| **1. Short post-resume wake pulse** | After resume, set the validated controller(s) to `on` briefly, then restore their original values. Linux defines this write as a runtime wake request. | One attended trial succeeded, including user-confirmed input after an idle pause and observed return to runtime suspension. Preserves normal idle autosuspend outside the pulse; repeated reliability and actual energy cost remain unmeasured. |
 | **2. Pre/post transition bracket** | Set `on` just before suspend, retain it for the first seconds after resume, then restore. More closely resembles the successful intervention without leaving it enabled for the entire awake session. | Could avoid a bad entry state while retaining normal idle PM afterward. Requires reliable restoration after failed/aborted suspend and no normal-session drift to `on`. Untested. |
 | **3. Finite longer autosuspend delay** | Keep `control=auto`, test e.g. 500–1000 ms instead of 50 ms on the supported controller attribute. | Still permits idle suspension, but delays it after transfers. Does not necessarily repair stale state across S3; may only defer recurrence. A value of `-1` disables autosuspend and is not a battery-friendly compromise. |
 | **4. Narrow persistent `on` override** | Closest to the successful test; first isolate child-only versus parent-only behavior. | Only the two-device combination has been tested, once. Keeping just the child active can still keep its parent active, so fewer writes do not guarantee lower consumption. Quantify before adopting. |
@@ -56,9 +73,9 @@ Source references use upstream Linux commit `aebb7274476403040d582c61478df8f4a7b
 
 These are independent of changing the screen lock or authentication stack. Neither weakening authentication nor increasing lock-screen timer delays repairs missing raw input.
 
-## Proposed next experiment: preserve idle PM
+## Validation plan: preserve idle PM
 
-This requires a new attended test, not automatic deployment:
+The initial wake-only trial above is complete. These steps remain the validation plan for repetition and fallback testing, not evidence of automatic deployment:
 
 1. Repeat baseline and known-good intervention at comparable sleep lengths, including at least one roughly minute-long cycle. Keep brightness, lid behavior and the input procedure consistent.
 2. Test **post-resume-only** `on` for a short 1–2 s window, then restore original settings. Do not keep extending the window until a result happens.
@@ -90,4 +107,4 @@ Do not estimate watts from `runtime_active_time`: it measures state residency, n
 
 ## Research disposition
 
-Recommendation: **keep both controls at `auto` now, test a short wake-only pulse next, and retain the transition bracket as the next fallback.** Do not add a default persistent SPI override to the installer on the strength of the current single comparison. No new power, driver, authentication or sleep-mode settings were changed during this research.
+Recommendation after the attended trial: **keep both controls at `auto` now; if authorized, offer the two-second wake-only pulse as an opt-in automatic workaround, not an always-on override.** Require repeated-cycle validation and reliable restoration before making it a default. Retain the transition bracket as a fallback only if the wake-only strategy fails. No persistent SPI, driver, authentication or sleep-mode change was made; the trial's temporary power changes were restored.
