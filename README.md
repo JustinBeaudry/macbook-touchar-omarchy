@@ -10,6 +10,7 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | Touch Bar stays blank after suspend/resume | Manual and automatic recovery confirmed; repeated reliability unverified |
 | Touch Bar appears lit during sleep | User-observed; full display-power lifecycle unresolved, wake recovery does not fix sleep power-off |
 | Keyboard/trackpad unresponsive after wake | SPI workaround removed; one short lid-open suspend felt fast with normal power-saving; longer controlled validation needed |
+| Unrequested early wake | Corrected RTC test resumed before its still-pending alarm; exact wake source unresolved |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
 ## Automatic wake recovery
@@ -45,6 +46,7 @@ Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first.
 - [USB input comparison and lid-event/re-suspend evidence](docs/usb-input-comparison.md)
 - [Fast lid-open suspend and sleep-duration caveat](docs/lid-open-comparison.md)
 - [Invalid RTC timed test correction and Touch Bar sleep-power observation](docs/rtc-test-correction-and-panel-sleep.md)
+- [Genuine early wake before the pending RTC alarm](docs/confirmed-early-wake.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
