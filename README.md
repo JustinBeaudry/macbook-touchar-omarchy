@@ -41,6 +41,7 @@ Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first.
 - [Lower-power remediation research and proposed tests](docs/spi-power-remediation-research.md)
 - [Optional two-second SPI pulse: install and rollback](docs/optional-spi-pulse.md)
 - [Transition bracket results and prompt raw input despite perceived delay](docs/transition-bracket-results.md)
+- [USB input comparison and lid-event/re-suspend evidence](docs/usb-input-comparison.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
