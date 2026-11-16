@@ -8,8 +8,8 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
 | Touch Bar stays blank after suspend/resume | Manual and automatic recovery confirmed; repeated reliability unverified |
-| Touch Bar appears lit during sleep | User-observed; full display-power lifecycle unresolved, wake recovery does not fix sleep power-off |
-| Keyboard/trackpad unresponsive after wake | SPI workaround removed; one short lid-open suspend felt fast with normal power-saving; longer controlled validation needed |
+| Touch Bar appears lit during sleep | Confirmed again during the completed timed sleep; full display-power lifecycle unresolved, wake recovery does not fix power-off |
+| Keyboard/trackpad unresponsive after wake | Responsive after the 54.1 s lid-wake-isolated sleep with normal SPI power-saving; normal lid-close behavior still needs validation |
 | Unrequested early wake | One lid-wake-disabled trial reached the RTC interval (54.1 s asleep vs 2.9 s baseline); lid wake restored, repeat validation needed |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 

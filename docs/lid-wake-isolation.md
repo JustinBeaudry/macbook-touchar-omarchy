@@ -16,7 +16,7 @@ Verified the local device as `/sys/bus/platform/devices/PNP0C0D:00`, firmware pa
 23:11:41.443 original LID0 wake=enabled restored
 ```
 
-The user reported completing the test. Physical input responsiveness and Touch Bar illumination during this longer interval were asked about separately; do not infer those outcomes from successful service completion.
+The user subsequently confirmed: **“input was responsive, touch bar did not turn off.”** This establishes user-perceived responsiveness after the longer completed interval, while Touch Bar sleep power-off remains unresolved. The panel behavior is an observation, not a measured energy-consumption result.
 
 ## Comparison
 
@@ -40,7 +40,7 @@ The temporary state/commands do not alter whether closing the lid normally reque
 
 ## Next steps and limits
 
-1. Confirm user-perceived input and Touch Bar behavior after this longer cycle.
+1. User-perceived input responsiveness is confirmed for this longer cycle; Touch Bar remaining lit is also confirmed. Keep those outcomes separate.
 2. Repeat the isolated timed test before adopting a workaround.
 3. Preserve ordinary close-lid/open-lid behavior: do not globally disable lid wake without explicit acceptance of losing open-lid wake.
 4. Research firmware/kernel lid-notification handling and, if justified, an opt-in policy that distinguishes already-open-lid explicit suspend from normal closed-lid suspend. That conditional policy has **not** been implemented or validated here.
