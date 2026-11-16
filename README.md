@@ -8,7 +8,7 @@ Field notes and local workarounds for the Apple T1 Touch Bar on a MacBookPro14,2
 | --- | --- |
 | Keyboard backlight dims when touching controls | Confirmed provider bug; local workaround previously user-tested |
 | Touch Bar stays blank after suspend/resume | Manual and automatic recovery confirmed; repeated reliability unverified |
-| Keyboard/trackpad unresponsive after wake | One temporary 2-second SPI pulse trial passed; optional automatic integration installed locally, end-to-end validation pending |
+| Keyboard/trackpad unresponsive after wake | Wake-only pulse restores idle PM, but the first installed automatic cycle still had ~10 s input delay; unresolved |
 | Earlier firmware recovery | Not reconstructed; no reproducible recovery claim |
 
 ## Automatic wake recovery
@@ -32,7 +32,7 @@ A separate, **experimental opt-in** pulses SPI runtime power for two seconds, th
 sudo bash install.sh --with-spi-pulse
 ```
 
-Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first. One temporary hardware trial passed; the automatic integration needs attended validation. Default installation leaves this feature off.
+Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first. One temporary trial passed, but the first installed automatic cycle still had about 10 seconds of input delay. This is **not yet a reliable input-delay fix**. Default installation leaves it off.
 
 ## Notes
 

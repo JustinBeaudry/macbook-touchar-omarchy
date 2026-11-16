@@ -4,7 +4,9 @@
 
 ## Local installation status
 
-Installed and verified on 2026-11-15: all three optional files are root-owned and match the repository copies; the effective suspend service queues the SPI service before Touch Bar recovery; the service has its independent restoration command configured. Unit verification passed with an unrelated existing NVMe-unit warning. The pulse unit is inactive pending its first automatic trigger, and both current power controls are `auto`. No pulse or sleep was triggered during installation. An attended sleep/wake under the installed integration is still pending.
+Installed and verified on 2026-11-15: all three optional files are root-owned and match the repository copies; the effective suspend service queues the SPI service before Touch Bar recovery; the service has its independent restoration command configured. Unit verification passed with an unrelated existing NVMe-unit warning. No pulse or sleep was triggered during installation.
+
+**First installed automatic cycle:** the pulse started about 0.2 s after systemd-sleep returned at `20:22:41.943`, held the policies `on` from `20:22:42.138` until restoration at `20:22:44.139`, and completed its independent cleanup successfully. Both policies were verified afterward as `auto`/`suspended`. Nevertheless, the user reported input still took about **10 seconds** after wake. The systemd-sleep invocation lasted about 384 seconds including transitions, longer than the earlier temporary trials. Thus installation/cleanup worked, but the wake-only pulse is **not a reliable latency remediation yet**. Do not promote it to a default or imply it fixes the input delay.
 
 ## Install or add to an existing installation
 
@@ -79,4 +81,4 @@ All **40 tests** in the combined standard-library suite passed locally. Coverage
 
 A separate transient user-unit test also confirmed that systemd executes `ExecStopPost` after an actual unit start timeout, using only a sleep command and temporary marker file. Unit configuration verification passed, with an unrelated warning from an existing NVMe suspend unit. Neither test establishes physical SPI recovery under the installed unit.
 
-The packaged automatic integration still requires its own attended sleep/wake test after installation. Do not promote the optional feature to a default or generalize model support from one temporary hardware trial.
+The first installed automatic test completed and restored power policy, but the user still reported about 10 seconds of input delay. Further controlled testing is needed; the next proposed candidate is a pre/post transition-only bracket, not a persistent always-on policy. Do not promote this optional feature to a default or generalize model support from one temporary successful trial.
