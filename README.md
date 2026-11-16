@@ -47,6 +47,7 @@ Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first.
 - [Fast lid-open suspend and sleep-duration caveat](docs/lid-open-comparison.md)
 - [Invalid RTC timed test correction and Touch Bar sleep-power observation](docs/rtc-test-correction-and-panel-sleep.md)
 - [Genuine early wake before the pending RTC alarm](docs/confirmed-early-wake.md)
+- [Instrumented wake counters, measured sleep time and lid-notification lead](docs/wake-source-diagnostics.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
