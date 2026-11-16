@@ -49,6 +49,7 @@ Read [safety, evidence and SPI-only rollback](docs/optional-spi-pulse.md) first.
 - [Genuine early wake before the pending RTC alarm](docs/confirmed-early-wake.md)
 - [Instrumented wake counters, measured sleep time and lid-notification lead](docs/wake-source-diagnostics.md)
 - [Lid wake isolation: first completed timed interval and restored normal policy](docs/lid-wake-isolation.md)
+- [Upstream sleep-power patch review: passing tests, packaging blocker and safety gaps](docs/upstream-socw-review.md)
 
 - [Confirmed post-sleep wake recovery](docs/confirmed-wake-recovery.md)
 - [Keyboard-backlight HUD fix](docs/keyboard-backlight.md)
