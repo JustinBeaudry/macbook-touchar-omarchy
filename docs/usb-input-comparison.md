@@ -43,7 +43,7 @@ The observer saw the second resume at `21:28:20.487`, reopened/retired both old 
 ## Disposition and next comparison
 
 - The SPI power workaround has not demonstrated a reliable end-to-end benefit and should not be broadened or made always-on.
-- Both SPI controls were checked afterward as `auto`. The optional wake-only feature remains installed pending user-authorized removal; confirmed Touch Bar illumination recovery is independent.
+- Both SPI controls were checked afterward as `auto`. The optional wake-only feature was subsequently removed with user authorization; removal, normal SPI policies, reconnection of the DasKeyboard and continued installation of Touch Bar recovery were all verified.
 - Recommend removing the unproven optional SPI feature and testing **one menu-triggered suspend with the lid left open throughout**, USB keyboard connected. Do not combine menu suspend with lid close.
 - That comparison separates lid-event behavior from the shared Linux/firmware/compositor/lock resume path. It is not a test of disabling the lock or authentication.
 

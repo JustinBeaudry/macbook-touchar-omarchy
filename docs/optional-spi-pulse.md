@@ -8,6 +8,8 @@ Installed and verified on 2026-11-15: all three optional files are root-owned an
 
 **First installed automatic cycle:** the pulse started about 0.2 s after systemd-sleep returned at `20:22:41.943`, held the policies `on` from `20:22:42.138` until restoration at `20:22:44.139`, and completed its independent cleanup successfully. Both policies were verified afterward as `auto`/`suspended`. Nevertheless, the user reported input still took about **10 seconds** after wake. The systemd-sleep invocation lasted about 384 seconds including transitions, longer than the earlier temporary trials. Thus installation/cleanup worked, but the wake-only pulse is **not a reliable latency remediation yet**. Do not promote it to a default or imply it fixes the input delay.
 
+**Later disposition (2026-11-15): removed locally with user authorization.** Both SPI controls were verified as `auto`, the optional unit/trigger were removed, and the confirmed Touch Bar recovery remained installed. Repeated perceived delays, including with a wired USB keyboard, did not establish a reliable benefit from this SPI workaround. The code remains experimental and opt-in for research, not a recommended latency fix. See [USB comparison](usb-input-comparison.md).
+
 ## Install or add to an existing installation
 
 Read [automatic recovery prerequisites and firmware limits](automatic-recovery.md) and [the research and evidence](spi-power-remediation-research.md) first.
