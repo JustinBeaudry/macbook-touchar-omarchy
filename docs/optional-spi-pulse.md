@@ -2,6 +2,10 @@
 
 **Experimental, opt-in.** For the verified MacBookPro14,2 setup only. This addresses delayed keyboard/trackpad input, separately from Touch Bar illumination. One attended temporary pulse trial passed, including user-confirmed input after an idle pause. Repeated reliability and energy cost remain unmeasured.
 
+## Local installation status
+
+Installed and verified on 2026-11-15: all three optional files are root-owned and match the repository copies; the effective suspend service queues the SPI service before Touch Bar recovery; the service has its independent restoration command configured. Unit verification passed with an unrelated existing NVMe-unit warning. The pulse unit is inactive pending its first automatic trigger, and both current power controls are `auto`. No pulse or sleep was triggered during installation. An attended sleep/wake under the installed integration is still pending.
+
 ## Install or add to an existing installation
 
 Read [automatic recovery prerequisites and firmware limits](automatic-recovery.md) and [the research and evidence](spi-power-remediation-research.md) first.
